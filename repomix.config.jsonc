@@ -1,0 +1,41 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-output.md",
+    "style": "markdown",
+    "compress": false,
+    "removeComments": true,
+    "removeEmptyLines": true,
+    "showLineNumbers": false,
+    "directoryStructure": true,
+    "fileSummary": true
+  },
+  "include": [
+    "**/*",
+    "README.md"
+  ],
+  "ignore": {
+    "customPatterns": [
+    "**/.env",
+      ".gitignore",
+      "node_modules/**",
+      ".git/**",
+      ".vscode/**",
+      ".eslintrc.json",
+      "repomix.config.jsonc",
+      "renovate.json",
+      "package-lock.json",
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/*.test.js",
+      "**/*.spec.js",
+      "LICENSE"
+    ],
+    "useGitignore": true,
+    "useDefaultPatterns": true
+  },
+  "security": {
+    // on met à false pour avoir le README et parce que ça ne craint rien dans ce projet exemple
+    "enableSecurityCheck": false
+  }
+}
