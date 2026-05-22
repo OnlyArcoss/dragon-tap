@@ -20,10 +20,12 @@ services:
       timeout: 5s
       retries: 5
 
-  board-react:
+  front:
     build:
       context: ./board-react
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4181}
     image: dragon-tap-board-react:latest
     container_name: dragon-tap-board-react
     restart: unless-stopped
@@ -33,7 +35,7 @@ services:
       - "8001:4182"
 
 
-  innkeeper-java:
+  api:
     build:
       context: ./innkeeper-java
       dockerfile: Dockerfile
@@ -48,7 +50,7 @@ services:
     networks:
       - dragontap-net
     ports:
-      - "4183:4181"
+      - "4181:4181"
 
 networks:
   dragontap-net:

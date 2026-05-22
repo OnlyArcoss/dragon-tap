@@ -4,8 +4,6 @@
 node_modules/
 /innkeeper-java/target/*
 
-.dockerignore
-
 /repomix-output.md
 CLAUDE*
 .claude
