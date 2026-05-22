@@ -20,36 +20,20 @@ services:
       timeout: 5s
       retries: 5
 
-  board:
+  board-react:
     build:
-      context: ./board
+      context: ./board-react
       dockerfile: Dockerfile
-    image: dragon-tap-bboard:latest
-    container_name: dragon-tap-bboard
+    image: dragon-tap-board-react:latest
+    container_name: dragon-tap-board-react
     restart: unless-stopped
     networks:
       - dragontap-net
     ports:
       - "8001:4182"
 
-  innkeeper:
-    build:
-      context: ./innkeeper
-      dockerfile: Dockerfile
-    image: dragon-tap-innkeeper:latest
-    container_name: dragon-tap-innkeeper
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://dragon:changeme@db:5432/dragon_db
-    networks:
-      - dragontap-net
-    ports:
-      - "4181:4181"
 
-  innkeeper_java:
+  innkeeper-java:
     build:
       context: ./innkeeper-java
       dockerfile: Dockerfile
