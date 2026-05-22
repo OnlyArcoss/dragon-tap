@@ -1,0 +1,75 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dragon-tap-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dragon
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: dragon_db
+    volumes:
+      - cellar:/var/lib/postgresql/data
+      - ./cellar/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - dragontap-net
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dragon -d dragon_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  board:
+    build:
+      context: ./board
+      dockerfile: Dockerfile
+    image: dragon-tap-bboard:latest
+    container_name: dragon-tap-bboard
+    restart: unless-stopped
+    networks:
+      - dragontap-net
+    ports:
+      - "8001:4182"
+
+  innkeeper:
+    build:
+      context: ./innkeeper
+      dockerfile: Dockerfile
+    image: dragon-tap-innkeeper:latest
+    container_name: dragon-tap-innkeeper
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://dragon:changeme@db:5432/dragon_db
+    networks:
+      - dragontap-net
+    ports:
+      - "4181:4181"
+
+  innkeeper_java:
+    build:
+      context: ./innkeeper-java
+      dockerfile: Dockerfile
+    image: dragon-tap-innkeeper-java:latest
+    container_name: dragon-tap-innkeeper-java
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/dragon_db?user=dragon&password=changeme
+    networks:
+      - dragontap-net
+    ports:
+      - "4183:4181"
+
+networks:
+  dragontap-net:
+    driver: bridge
+
+volumes:
+  cellar:
+    driver: local
