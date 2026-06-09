@@ -25,15 +25,12 @@ services:
       context: ./board-react
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:4181}
+        VITE_API_URL: ${VITE_API_URL:-}
     image: dragon-tap-board-react:latest
     container_name: dragon-tap-board-react
     restart: unless-stopped
     networks:
       - dragontap-net
-    ports:
-      - "8001:4182"
-
 
   api:
     build:
@@ -49,8 +46,20 @@ services:
       DATABASE_URL: jdbc:postgresql://db:5432/dragon_db?user=dragon&password=changeme
     networks:
       - dragontap-net
+
+  proxy:
+    image: nginx:stable-alpine
+    container_name: dragon-tap-proxy
+    restart: unless-stopped
     ports:
-      - "4181:4181"
+      - "80:80"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - front
+      - api
+    networks:
+      - dragontap-net
 
 networks:
   dragontap-net:
