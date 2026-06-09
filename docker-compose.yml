@@ -1,12 +1,12 @@
 services:
-  db:
+  cellar:
     image: postgres:16-alpine
-    container_name: dragon-tap-db
+    container_name: dragon-tap-cellar
     restart: unless-stopped
     env_file:
       - ./cellar/.env
     volumes:
-      - cellar:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
       - ./cellar/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - dragontap-net
@@ -16,44 +16,44 @@ services:
       timeout: 5s
       retries: 5
 
-  front:
+  board:
     build:
       context: ./board-react
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-}
-    image: dragon-tap-board-react:latest
-    container_name: dragon-tap-board-react
+    image: dragon-tap-board:latest
+    container_name: dragon-tap-board
     restart: unless-stopped
     networks:
       - dragontap-net
 
-  api:
+  innkeeper:
     build:
       context: ./innkeeper-java
       dockerfile: Dockerfile
-    image: dragon-tap-innkeeper-java:latest
-    container_name: dragon-tap-innkeeper-java
+    image: dragon-tap-innkeeper:latest
+    container_name: dragon-tap-innkeeper
     restart: unless-stopped
     depends_on:
-      db:
+      cellar:
         condition: service_healthy
     env_file:
-      - ./innkeeper-java/.env
+      - ./cellar/.env
     networks:
       - dragontap-net
 
-  proxy:
+  gatekeeper:
     image: nginx:stable-alpine
-    container_name: dragon-tap-proxy
+    container_name: dragon-tap-gatekeeper
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
-      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./gatekeeper/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - front
-      - api
+      - board
+      - innkeeper
     networks:
       - dragontap-net
 
@@ -62,5 +62,5 @@ networks:
     driver: bridge
 
 volumes:
-  cellar:
+  pgdata:
     driver: local
