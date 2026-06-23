@@ -2,7 +2,8 @@
 
 ## Composition de l'équipe
 
-<!-- À compléter : Nom Prénom de chaque membre du groupe -->
+- Frin Arthur
+- Amozigh Jonas
 
 ## Stack technique
 
@@ -72,7 +73,3 @@ gatekeeper (nginx)
 ## Persistance des données
 
 Le volume nommé `pgdata` assure la persistance de PostgreSQL entre les redémarrages.
-
-## Problèmes rencontrés et solutions
-
-<!-- À compléter -->
